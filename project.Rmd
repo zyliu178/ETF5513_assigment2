@@ -1,0 +1,77 @@
+---
+title: "Analysis Australia Labour Force"
+author: "Zeyu Liu"
+output:
+  html_document:
+    toc: false
+    toc_float: false
+    theme: cerulean
+keep_md: TRUE    
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, cache=TRUE, warning=FALSE, message=FALSE)
+options(width=80,digits=3)
+```
+
+```{r packages}
+library(tidyverse)
+library(readxl)
+library(dplyr)
+library(ggplot2)
+library(kableExtra)
+```
+
+```{r import_data}
+# Read data
+mydata <- Labour_Force_Austrlia <- read_excel("Data/Labour Force Austrlia.xls", 
+    sheet = "Data1", range = "A1:D516", col_types = c("date", 
+        "numeric", "numeric", "numeric"))
+
+# Data wrangling
+mydata <-  mydata[-1:-9,]
+names(mydata) <- c("Date", "Total", "Males", "Females")
+```
+
+```{r plot_number, fig.cap= "等着我加" }
+ggplot(mydata, aes(x = Date))+
+  geom_line(aes(y = Total, colour = "Total"))+
+  geom_line(aes(y = Males, colour ="Males"))+
+  geom_line(aes(y = Females, colour = "Females"))+
+  ylab("Number of people in labour force")
+```
+
+```{r plot_percentage}
+perc_females <- mydata$Females/mydata$Total
+perc_males <- mydata$Males/mydata$Total
+mydata <- mutate(mydata, perc_females, perc_males)
+ggplot(mydata, aes(x = Date))+
+  geom_line(aes(y = perc_females, colour = "females"))+
+  geom_line(aes(y = perc_males, colour ="males"))+
+  ylab("percentage in labour force")
+```
+
+```{r table1, message=TRUE, paged.print=TRUE}
+summary_table_female <- summary(mydata$perc_females) %>%
+  unclass()
+summary_table_male <- summary(mydata$perc_males) %>% 
+  unclass()
+kable(summary_table_female)
+kable(summary_table_male)
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
